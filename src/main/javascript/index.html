@@ -1,0 +1,175 @@
+<!-- 
+		Name: Robert Seifert
+		Date: Oct 11, 2014
+		Class: CIT147, Javascript Fundamentals
+		Project 3
+ -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <title>Whack-A-Mole (CIT147)</title>
+    
+    <script src="js/jquery.js"></script>
+    
+    <script> 
+    
+        var hasGameRun = false;
+        var isGameRunning = false;
+        var playerScore = 0;
+        var timeLeft = 30;
+        var moleID = 0;
+        
+        $(document).ready(function()
+        { 
+            $("#stop_button").hide();
+            $("#start_button").click(function()
+            {
+               startGame() 
+            });
+             $("#stop_button").click(function()
+            {
+               stopGame() 
+            });
+            $("#gamespace").delegate( "img", "click", function()
+            {
+                $(this).fadeOut("fast")
+                increaseScore();
+            });
+        });
+        
+        function startGame()
+        {
+            //Resets the game for the next run
+            if(hasGameRun)
+            {
+                resetGame()
+            }
+            
+            hasGameRun = true;
+            isGameRunning = true;
+            $("#start_button").hide();
+            $("#start_info").hide();
+            $("#stop_button").show();
+            $("#score").show();
+            $("#timer").show();
+            addMole();
+            gameLoop();
+        }
+        
+        //Main game loop, calls itself using setTimeout until the timer hits zero
+        function gameLoop()
+        {
+            if(timeLeft >= 1 && isGameRunning)
+            {
+                //Decrease time and loop
+                decreaseTime();
+                setTimeout("gameLoop()", 1000);
+            }
+            else
+            {
+                endGame();               
+            }
+        }
+        
+        //Stops the game
+        function stopGame()
+        {
+            isGameRunning = false;
+        }
+        
+        function resetGame()
+        {
+            playerScore = 0;
+            moleID = 0;
+            timeLeft = 30;
+            $('#score').text("0 pts")      
+        }
+        
+        //End Game
+        function endGame()
+        {            
+            //Clear board
+            $('#gamespace').empty();
+            //Show start button and info
+            $("#start_button").show();
+            $("#start_info").show();
+            //Hide timer and stop button
+            $("#stop_button").hide();
+            $("#timer").hide();
+        }
+        
+        function addMole()
+        {
+            if(timeLeft > 0 && isGameRunning)
+            {
+                moleID += 1;
+                $('#gamespace').append('<img id="mole' + moleID + '" src="img/mole.jpg" style="top:'+getRandomY()+'px;left:'+getRandomX()+'px;"/>');
+                setTimeout("addMole()", Math.floor(Math.random() * 2000));
+                setTimeout('removeMole(' + moleID + ')', 500 + Math.floor(Math.random() * 500));
+            }
+        }
+        
+        function removeMole(num)
+        {
+            $('#gamespace').find('#mole' + num).remove();
+        }
+        
+        function decreaseTime()
+        {
+            $('#timer').text(timeLeft + ' seconds left');
+            if(timeLeft > 0)
+            {
+                timeLeft -= 1; 
+            }                
+        }
+        
+        function increaseScore()
+        {
+            playerScore = playerScore + 1;
+            $('#score').text(playerScore + ' pts');
+        }
+        
+        function getRandomY()
+        {
+            return Math.floor(Math.random() * 250);
+        }
+        
+        function getRandomMole()
+        {
+            return Math.floor(Math.random() * moles);
+        }
+            
+        function getRandomX()
+        {
+            return Math.floor(Math.random() * 500);
+        }
+    </script>
+    
+    <!-- CSS styles: This is for me to worry about; not you. -->
+	<link href="css/game.css" rel="stylesheet" />
+    
+  </head>
+  <body>
+
+	<div id="content">
+
+		<h1>Whack-A-Mole</h1>
+		
+		<p id="start_info">After clicking "start", you will have 30 seconds to click
+		as many moles as you can. The moles appear randomly so be ready! </p>
+		
+		<div id="controls">
+			<span id="score">0 pts</span>
+			<button type="button" id="start_button">Start!</button>
+            <button type="button" id="stop_button">Stop!</button>
+		</div>
+		
+		<div id="timer">30 seconds left</div>
+		
+		<div id="gamespace"></div>
+		
+	</div>
+  </body>
+</html>
